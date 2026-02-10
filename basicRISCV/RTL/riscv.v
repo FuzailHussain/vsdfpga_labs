@@ -6,6 +6,7 @@
 `default_nettype none
 `include "clockworks.v"
 `include "emitter_uart.v"
+`include "SB_HF0SC.v"
 
 module Memory (
    input             clk,
@@ -176,12 +177,7 @@ module Processor (
 				             Bimm[31:0] );
    wire [31:0] PCplus4 = PC+4;
    
-   // register write back
-   assign writeBackData = (isJAL || isJALR) ? PCplus4   :
-			      isLUI         ? Uimm      :
-			      isAUIPC       ? PCplusImm :
-			      isLoad        ? LOAD_data :
-			                      aluOut;
+
 
    wire [31:0] nextPC = ((isBranch && takeBranch) || isJAL) ? PCplusImm   :
 	                                  isJALR   ? {aluPlus[31:1],1'b0} :
@@ -215,6 +211,13 @@ module Processor (
          mem_byteAccess ? {{24{LOAD_sign}},     LOAD_byte} :
      mem_halfwordAccess ? {{16{LOAD_sign}}, LOAD_halfword} :
                           mem_rdata ;
+
+    // register write back
+   assign writeBackData = (isJAL || isJALR) ? PCplus4   :
+			      isLUI         ? Uimm      :
+			      isAUIPC       ? PCplusImm :
+			      isLoad        ? LOAD_data :
+			                      aluOut;
 
    // Store
    // ------------------------------------------------------------------------
@@ -357,6 +360,7 @@ module SOC (
    localparam IO_LEDS_bit      = 0;  // W five leds
    localparam IO_UART_DAT_bit  = 1;  // W data to send (8 bits) 
    localparam IO_UART_CNTL_bit = 2;  // R status. bit 9: busy sending
+   localparam IO_GPIO_REG_ADDR = 32'h2000_0000; // Base address for I2C master
    
    always @(posedge clk) begin
       if(isIO & mem_wstrb & mem_wordaddr[IO_LEDS_bit]) begin
@@ -364,6 +368,19 @@ module SOC (
 //	 $display("Value sent to LEDS: %b %d %d",mem_wdata,mem_wdata,$signed(mem_wdata));
       end
    end
+
+   wire isGPIO_reg = mem_addr[31:16] == IO_GPIO_REG_ADDR[31:16];
+   wire [31:0] GPIO_mem_rdata;
+
+   I2C_master_standard I2C(
+      .clk(clk),
+      .rst_n(resetn),
+      .wr_en(isGPIO_reg & mem_wstrb),
+      .r_en(isGPIO_reg & mem_rstrb),
+      .addr_offset(mem_addr[7:0]),
+      .data_in(mem_wdata),
+      .data_out(GPIO_mem_rdata)
+   );
 
    wire uart_valid = isIO & mem_wstrb & mem_wordaddr[IO_UART_DAT_bit];
    wire uart_ready;
@@ -385,8 +402,8 @@ module SOC (
 	       mem_wordaddr[IO_UART_CNTL_bit] ? { 22'b0, !uart_ready, 9'b0}
 	                                      : 32'b0;
    
-   assign mem_rdata = isRAM ? RAM_rdata :
-	                      IO_rdata ;
+   assign mem_rdata = isGPIO_reg ? GPIO_mem_rdata : (isRAM ? RAM_rdata :
+	                      IO_rdata);
    
    
 `ifdef BENCH

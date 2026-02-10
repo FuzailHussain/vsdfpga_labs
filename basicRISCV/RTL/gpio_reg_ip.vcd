@@ -1,0 +1,115 @@
+$date
+	Sun Feb  8 23:14:01 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_gpio_reg_ip $end
+$var wire 32 ! data_out [31:0] $end
+$var reg 8 " addr_offset [7:0] $end
+$var reg 1 # clk $end
+$var reg 32 $ data_in [31:0] $end
+$var reg 1 % en $end
+$var reg 1 & wr $end
+$scope module dut $end
+$var wire 8 ' addr_offset [7:0] $end
+$var wire 1 # clk $end
+$var wire 32 ( data_in [31:0] $end
+$var wire 1 % en $end
+$var wire 1 & wr $end
+$var reg 32 ) data [31:0] $end
+$var reg 32 * data_out [31:0] $end
+$var reg 32 + dir [31:0] $end
+$var reg 32 , gpio_in [31:0] $end
+$var reg 32 - gpio_out [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+bx -
+b0 ,
+bx +
+bx *
+bx )
+bx (
+b0 '
+0&
+1%
+bx $
+0#
+b0 "
+bx !
+$end
+#5000
+1#
+#10000
+0#
+b100 "
+b100 '
+#15000
+1#
+#20000
+0#
+b1000 "
+b1000 '
+#25000
+1#
+#30000
+0#
+b10100101101001011010010110100101 $
+b10100101101001011010010110100101 (
+b0 "
+b0 '
+1&
+#35000
+b10100101101001011010010110100101 )
+1#
+#40000
+0#
+b11111111111111111111111111110000 $
+b11111111111111111111111111110000 (
+b100 "
+b100 '
+#45000
+bx0x00x0xx0x00x0xx0x00x0xx0x00x0x -
+b11111111111111111111111111110000 +
+1#
+#50000
+0#
+b0 "
+b0 '
+0&
+#55000
+b10100101101001011010010110100000 -
+b10100101101001011010010110100101 !
+b10100101101001011010010110100101 *
+1#
+#60000
+0#
+b100 "
+b100 '
+#65000
+b11111111111111111111111111110000 !
+b11111111111111111111111111110000 *
+1#
+#70000
+0#
+b1000 "
+b1000 '
+#75000
+b10100101101001011010010110100000 !
+b10100101101001011010010110100000 *
+1#
+#80000
+0#
+#85000
+1#
+#90000
+0#

@@ -4,6 +4,7 @@
  *   FPGA kind      : ICE40
  *   Input frequency: 12 MHz
  */
+`include "SB_PLL40_CORE.v"
 
  module femtoPLL #(
     parameter freq = 40

@@ -1,5 +1,7 @@
 
 #include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
 
 void print_string(const char* s) {
    for(const char* p = s; *p; ++p) {
@@ -29,6 +31,8 @@ void print_dec(int val) {
       putchar('0' + *(--p));
    }
 }
+
+void print_hex_digits(unsigned int val, int nbdigits); // forward declaration
 
 void print_hex(unsigned int val) {
    print_hex_digits(val, 8);

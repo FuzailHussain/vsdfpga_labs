@@ -102,7 +102,7 @@ module Clockworks
 `ifdef ICE_STICK
 	 reg [11:0] 	    reset_cnt = 0;
 `else   
-	 reg [15:0] 	    reset_cnt = 0;
+	 reg [2:0] 	    reset_cnt = 0;
 `endif   
 	 assign resetn = &reset_cnt;
 
