@@ -6,7 +6,8 @@
 `default_nettype none
 `include "clockworks.v"
 `include "emitter_uart.v"
-`include "SB_HF0SC.v"
+//`include "SB_HF0SC.v"
+//`include "SB_PLL40_CORE.v"
 
 module Memory (
    input             clk,
