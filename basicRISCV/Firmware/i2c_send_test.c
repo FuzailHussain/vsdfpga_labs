@@ -32,19 +32,19 @@ static void delay(volatile uint32_t count)
 int main(void)
 {
     uint32_t status = I2C_REG(I2C_STATUS);
-    printf("Status: 0x%08X\n", status);
+    printf("Status: 0x %08X \n", status);
     /* -----------------------------
      * Program I2C registers
      * ----------------------------- */
 
-    I2C_REG(I2C_CLK_DIV)    = 2;        // clk_div
-    delay(10);
-    I2C_REG(I2C_SLAVE_ADDR) = 0x55;     // slave address
-    delay(10);
-    I2C_REG(I2C_TX_DATA)    = 0xA6;     // data to send
-    delay(10);
+    I2C_REG(I2C_CLK_DIV)    = 0x7F;        // clk_div
+    delay(500);
+    I2C_REG(I2C_SLAVE_ADDR) = 0x10;     // slave address
+    delay(500);
+    I2C_REG(I2C_TX_DATA)    = 0x02C00100;     // data to send
+    delay(500);
     I2C_REG(I2C_MODE)       = 0;        // 0 = transmit mode
-    delay(10);
+    delay(500);
 
     /* -----------------------------
      * Start I2C transaction
@@ -62,9 +62,10 @@ int main(void)
      * ----------------------------- */
     do {
         status = I2C_REG(I2C_STATUS);
+    	delay(10);
     } while ((status & I2C_STATUS_DONE_MASK) == 0);
 
-    printf("I2C transaction completed. Status: 0x%08X\n", status);
+    printf("I2C transaction completed. Status: 0x %08X \n", status);
     /* -----------------------------
      * Read back data (if RX mode)
      * ----------------------------- */
@@ -72,6 +73,8 @@ int main(void)
 
     while (1) {
         /* idle loop */
+	delay(10000);
+        printf("I2C transaction completed. Status: 0x %08X \n", status);
     }
 
     return 0;
