@@ -318,7 +318,9 @@ module SOC (
     input 	     RESET,// reset button
     output reg [4:0] LEDS, // system LEDs
     input 	     RXD,  // UART receive
-    output 	     TXD   // UART transmit
+    output 	     TXD,   // UART transmit
+    output reg    scl,
+    inout         sda
 );
 
    wire clk;
@@ -372,6 +374,7 @@ module SOC (
    wire isGPIO_reg = mem_addr[31:16] == IO_GPIO_REG_ADDR[31:16];
    wire [31:0] GPIO_mem_rdata;
 
+   
    I2C_master_standard I2C(
       .clk(clk),
       .rst_n(resetn),
@@ -379,7 +382,9 @@ module SOC (
       .r_en(isGPIO_reg & mem_rstrb),
       .addr_offset(mem_addr[7:0]),
       .data_in(mem_wdata),
-      .data_out(GPIO_mem_rdata)
+      .data_out(GPIO_mem_rdata),
+	   .scl(scl),
+	   .sda(sda)
    );
 
    wire uart_valid = isIO & mem_wstrb & mem_wordaddr[IO_UART_DAT_bit];

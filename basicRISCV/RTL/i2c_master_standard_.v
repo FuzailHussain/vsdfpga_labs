@@ -14,15 +14,15 @@ module I2C_master_standard (
     // Registers
     // ---------------------------------
     reg        start_enable;
-    reg [7:0]  clk_div;
+    reg [23:0]  clk_div;
     reg [6:0]  slave_addr;
-    reg [7:0]  data_to_send;
+    reg [31:0]  data_to_send;
     reg [7:0]  data_received;
     reg [1:0]  status;
     reg        mode;          // 0 = TX, 1 = RX
 
-    reg [7:0]  clk_count;
-    reg [4:0]  bit_index;
+    reg [23:0]  clk_count;
+    reg [5:0]  bit_index;
 
     // SDA open-drain control
     reg sda_drive_low;
@@ -34,9 +34,9 @@ module I2C_master_standard (
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             start_enable <= 1'b0;
-            clk_div      <= 8'd1;
+            clk_div      <= 24'd1;
             slave_addr   <= 7'd0;
-            data_to_send <= 8'd0;
+            data_to_send <= 32'd0;
             data_received <= 8'd0;
             status       <= 2'd0;
             mode         <= 1'b0;
@@ -45,9 +45,10 @@ module I2C_master_standard (
             if (wr_en) begin
                 case (addr_offset)
                     8'h00: start_enable <= |data_in;
-                    8'h04: clk_div      <= data_in[7:0];
+                    8'h04: // clk_div      <= data_in[7:0];
+			     clk_div <= 24'hbbbbbb;	
                     8'h08: slave_addr   <= data_in[6:0];
-                    8'h0C: data_to_send <= data_in[7:0];
+                    8'h0C: data_to_send <= data_in[31:0];
                     8'h18: mode         <= data_in[0];
                     default: ;
                 endcase
@@ -77,7 +78,7 @@ module I2C_master_standard (
     // ---------------------------------
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            clk_count <= 8'd0;
+            clk_count <= 24'd0;
             scl       <= 1'b1;
         end else if (!start_enable) begin
             scl <= 1'b1; // Idle state of SCL is high
@@ -85,7 +86,7 @@ module I2C_master_standard (
             scl <= clk;
         end else begin
             if (clk_count == (clk_div >> 1) - 1) begin
-                clk_count <= 8'd0;
+                clk_count <= 24'd0;
                 scl <= ~scl;
             end else begin
                 clk_count <= clk_count + 1'b1;
@@ -98,13 +99,13 @@ module I2C_master_standard (
     // ---------------------------------
     always @(posedge scl or negedge rst_n) begin
         if (!rst_n) begin
-            bit_index     <= 5'd0;
+            bit_index     <= 6'd0;
             sda_drive_low <= 1'b0;
             data_received <= 8'd0;
         end else begin
 
             if (bit_index == 0) begin
-                status <= 2'b01; // BUSY
+                status <= 2'b00; // BUSY
             end
             // Address + R/W bit
             if (bit_index < 7) begin
@@ -127,10 +128,10 @@ module I2C_master_standard (
             end
 
             // Data phase
-            else if (bit_index < 18 && mode == 1'b0) begin
-                sda_drive_low <= ~data_to_send[17 - bit_index];
+            else if (bit_index < 42 && mode == 1'b0) begin
+                sda_drive_low <= ~data_to_send[41 - bit_index];
                 bit_index <= bit_index + 1;
-            end else if (bit_index < 18 && mode == 1'b1) begin
+            end else if (bit_index < 42 && mode == 1'b1) begin
                 data_received[15 - bit_index] <= sda;
                 bit_index <= bit_index + 1;
             end
@@ -138,8 +139,8 @@ module I2C_master_standard (
             // Done
             else begin
                 sda_drive_low <= 1'b0;
-                bit_index <= 5'd0;
-                status <= 2'b00; // done
+                bit_index <= 6'd0;
+                status <= 2'b01; // done
                 start_enable <= 1'b0; // auto-clear start
             end
         end
