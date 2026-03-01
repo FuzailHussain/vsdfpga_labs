@@ -10,3 +10,6 @@ set_io  CLK 28
 
 set_io  TXD 4
 set_io  RXD 3
+
+set_io  scl 37
+set_io  sda 36
