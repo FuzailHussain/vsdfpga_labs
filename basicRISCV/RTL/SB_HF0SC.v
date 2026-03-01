@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 module SB_HFOSC (
     input       CLKHFEN,
     input       CLKHFPU,

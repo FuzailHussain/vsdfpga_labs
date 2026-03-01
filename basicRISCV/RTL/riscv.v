@@ -4,11 +4,12 @@
  */
 
 `default_nettype none
+`define BENCH
 `include "clockworks.v"
 `include "emitter_uart.v"
 `include "i2c_master_standard_.v"
-//`include "SB_HF0SC.v"
-//`include "SB_PLL40_CORE.v"
+`include "SB_HF0SC.v"
+`include "SB_PLL40_CORE.v"
 
 module Memory (
    input             clk,
@@ -316,12 +317,12 @@ endmodule
 
 
 module SOC (
-   //  input 	     CLK,  // system clock 
+    input 	     CLK,  // system clock 
     input 	     RESET,// reset button
     output reg [4:0] LEDS, // system LEDs
     input 	     RXD,  // UART receive
     output 	     TXD,  // UART transmit
-    output reg    scl,
+    output        scl,
     inout         sda
 );
 
