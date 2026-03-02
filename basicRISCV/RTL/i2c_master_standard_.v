@@ -28,6 +28,8 @@ module I2C_master_standard (
     reg sda_drive_low;
     assign sda = sda_drive_low ? 1'b0 : 1'bz;
 
+    reg scl_drive_low;
+    assign scl = scl_drive_low ? 1'b0 : 1'bz;
     // ---------------------------------
     // Register interface
     // ---------------------------------
@@ -45,8 +47,8 @@ module I2C_master_standard (
             if (wr_en) begin
                 case (addr_offset)
                     8'h00: start_enable <= |data_in;
-                    8'h04: // clk_div      <= data_in[7:0];
-			     clk_div <= 24'hbbbbbb;	
+                    8'h04:  clk_div      <= data_in[7:0];
+			    //  clk_div <= 24'hbbbbbb;	
                     8'h08: slave_addr   <= data_in[6:0];
                     8'h0C: data_to_send <= data_in[31:0];
                     8'h18: mode         <= data_in[0];
@@ -79,15 +81,15 @@ module I2C_master_standard (
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             clk_count <= 24'd0;
-            scl       <= 1'b1;
+            scl_drive_low <= 1'b0;
         end else if (!start_enable) begin
-            scl <= 1'b1; // Idle state of SCL is high
+            scl_drive_low <= 1'b0; // Idle state of SCL is high
         end else if (clk_div <= 1) begin
-            scl <= clk;
+            scl_drive_low <= ~clk;
         end else begin
             if (clk_count == (clk_div >> 1) - 1) begin
                 clk_count <= 24'd0;
-                scl <= ~scl;
+                scl_drive_low <= ~scl_drive_low; // Toggle SCL
             end else begin
                 clk_count <= clk_count + 1'b1;
             end
