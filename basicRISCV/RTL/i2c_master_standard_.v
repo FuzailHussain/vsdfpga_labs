@@ -42,7 +42,6 @@ module I2C_master_standard (
             data_received <= 8'd0;
             status       <= 2'd0;
             mode         <= 1'b0;
-            data_out     <= 32'd0;
         end else begin
             if (wr_en) begin
                 case (addr_offset)
@@ -99,6 +98,7 @@ module I2C_master_standard (
     // ---------------------------------
     // I2C transmit / receive (simplified)
     // ---------------------------------
+    reg status_done;
     always @(posedge scl or negedge rst_n) begin
         if (!rst_n) begin
             bit_index     <= 6'd0;
@@ -107,6 +107,7 @@ module I2C_master_standard (
         end else begin
 
             if (bit_index == 0) begin
+                status_done <= 1'b0;
                 status <= 2'b00; // BUSY
             end
             // Address + R/W bit
@@ -143,8 +144,14 @@ module I2C_master_standard (
                 sda_drive_low <= 1'b0;
                 bit_index <= 6'd0;
                 status <= 2'b01; // done
-                start_enable <= 1'b0; // auto-clear start
+                status_done <= 1'b1;
             end
+        end
+    end
+
+    @always @(posedge clk or negedge rst_n) begin
+        if (status_done) begin
+            start_enable <= 1'b0; // auto-clear start after transaction completes
         end
     end
 
