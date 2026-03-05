@@ -322,8 +322,8 @@ module SOC (
     output reg [4:0] LEDS, // system LEDs
     input 	     RXD,  // UART receive
     output 	     TXD,  // UART transmit
-    output        scl,
-    inout         sda
+    inout        scl,
+    inout        sda
 );
 
    wire clk;

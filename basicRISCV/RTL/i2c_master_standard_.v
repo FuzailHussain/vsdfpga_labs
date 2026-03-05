@@ -6,7 +6,7 @@ module I2C_master_standard (
     input  [7:0]  addr_offset,
     input  [31:0] data_in,
     output reg [31:0] data_out,
-    output reg    scl,
+    inout    	  scl,
     inout         sda
 );
 
@@ -39,8 +39,6 @@ module I2C_master_standard (
             clk_div      <= 24'd1;
             slave_addr   <= 7'd0;
             data_to_send <= 32'd0;
-            data_received <= 8'd0;
-            status       <= 2'd0;
             mode         <= 1'b0;
         end else begin
             if (wr_en) begin
@@ -53,7 +51,11 @@ module I2C_master_standard (
                     8'h18: mode         <= data_in[0];
                     default: ;
                 endcase
-            end
+            end else begin 
+		 if (status_done) begin
+            	     start_enable <= 1'b0; // auto-clear start after transaction completes
+        	 end
+	    end
         end
     end
 
@@ -149,10 +151,5 @@ module I2C_master_standard (
         end
     end
 
-    @always @(posedge clk or negedge rst_n) begin
-        if (status_done) begin
-            start_enable <= 1'b0; // auto-clear start after transaction completes
-        end
-    end
 
 endmodule
