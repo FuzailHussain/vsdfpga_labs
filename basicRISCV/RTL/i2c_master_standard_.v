@@ -185,6 +185,7 @@ module I2C_master_standard (
                         status <= 2'b01; 
                     end
                 end
+            endcase
         end
     end
 
