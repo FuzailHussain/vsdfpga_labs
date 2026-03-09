@@ -40,7 +40,6 @@ module I2C_master_standard (
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             start_enable <= 1'b0;
-            scl_enable     <= 1'b0;
             clk_div      <= 24'd1;
             slave_addr   <= 7'd0;
             data_to_send <= 32'd0;
@@ -91,7 +90,7 @@ module I2C_master_standard (
         end else if (!scl_enable) begin
             scl_tick <= 1'b0;
         end else if (clk_div <= 1) begin
-            scl_tick <= ~clk;
+            scl_tick <= 1'b0;
         end else begin
             if (clk_count == (clk_div >> 1) - 1) begin
                 clk_count <= 24'd0;
@@ -117,11 +116,12 @@ module I2C_master_standard (
 
     reg [1:0] state;
     reg status_done;
-    always @(posedge scl or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             bit_index     <= 6'd0;
             status         <= 2'b00; // IDLE
             state          <= IDLE;
+            scl_enable      <= 1'b0;
             scl_drive_low <= 1'b0;
             sda_drive_low <= 1'b0;
             data_received <= 8'd0;
